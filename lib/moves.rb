@@ -1,7 +1,7 @@
 #class Player
 class Player
   attr_accessor :name, :king, :queen, :bishop1, :bishop2, :knight1, :knight2, :rook1, :rook2
-  attr_accessor :pawn1, :pawn2, :pawn3, :pawn4, :pawn5, :pawn6, :pawn7, :pawn8
+  attr_accessor :pawn1, :pawn2, :pawn3, :pawn4, :pawn5, :pawn6, :pawn7, :pawn8, :pieces
   
   def initialize(pieces)
     name = gets.chomp.upcase
@@ -22,6 +22,7 @@ class Player
     @pawn6 = Pawn.new(pieces[5])
     @pawn7 = Pawn.new(pieces[5])
     @pawn8 = Pawn.new(pieces[5])
+    @pieces = [@king, @queen, @bishop1, @bishop2, @knight1, @knight2, @rook1, @rook2, @pawn1, @pawn2, @pawn3, @pawn4, @pawn5, @pawn6, @pawn7, @pawn8]
   end  
 end
 
@@ -111,24 +112,114 @@ class Pawn
     @piece = piece
     @path = 0
   end
-  def move(position)
-    if @path == 0
-      posibles = [[1, 0], [2, 0]]
-      @path += 1
-    else
-      posibles = [[1, 0], [1, -1], [1, 1]]
-      @path += 1
+  
+  #move method for player1
+  def move(position, curr_player, other_player, path = 0)
+    posibles = []
+    other = false
+    curr = false
+    other_player.pieces.each do |piece|
+      if piece.position == [position[0] + 2, position[1]]
+        other = true
+      end
     end
+    curr_player.pieces.each do |piece|
+      if piece.position == [position[0] + 2, position[1]]
+        curr = true
+      end
+    end
+    if (!other && !curr) && @path == 0
+      posibles << [2, 0]
+    end
+    other = false
+    curr = false
+    other_player.pieces.each do |piece|
+      if piece.position == [position[0] + 1, position[1]]
+        other = true
+      end
+    end
+    curr_player.pieces.each do |piece|
+      if piece.position == [position[0] + 1, position[1]]
+        curr = true
+      end
+    end
+    if !other && !curr
+      posibles << [1, 0]
+    end
+    other = false
+    other_player.pieces.each do |piece|
+      if piece.position == [position[0] + 1, position[1] - 1]
+        other = true
+      end
+    end
+    if other
+      posibles << [1, -1]
+    end
+    other = false
+    other_player.pieces.each do |piece|
+      if piece.position == [position[0] + 1, position[1] + 1]
+        other = true
+      end
+    end
+    if other
+      posibles << [1, 1]
+    end
+    @path += 1
     select_moves(position, posibles)
   end
-  def move2(position, path = 0)
-    if @path == 0
-      posibles = [[-1, 0], [-2, 0]]
-      @path += 1
-    else
-      posibles = [[-1, 0], [-1, 1], [-1, -1]]
-      @path += 1
+  
+  #move method for player2
+  def move2(position, curr_player, other_player, path = 0)
+    posibles = []
+    other = false
+    curr = false
+    other_player.pieces.each do |piece|
+      if piece.position == [position[0] - 2, position[1]]
+        other = true
+      end
     end
+    curr_player.pieces.each do |piece|
+      if piece.position == [position[0] - 2, position[1]]
+        curr = true
+      end
+    end
+    if (!other && !curr) && @path == 0
+      posibles << [-2, 0]
+    end
+    other = false
+    curr = false
+    other_player.pieces.each do |piece|
+      if piece.position == [position[0] - 1, position[1]]
+        other = true
+      end
+    end
+    curr_player.pieces.each do |piece|
+      if piece.position == [position[0] - 1, position[1]]
+        curr = true
+      end
+    end
+    if !other && !curr
+      posibles << [-1, 0]
+    end
+    other = false
+    other_player.pieces.each do |piece|
+      if piece.position == [position[0] - 1, position[1] + 1]
+        other = true
+      end
+    end
+    if other
+      posibles << [-1, 1]
+    end
+    other = false
+    other_player.pieces.each do |piece|
+      if piece.position == [position[0] - 1, position[1] - 1]
+        other = true
+      end
+    end
+    if other
+      posibles << [-1, -1]
+    end
+    @path += 1
     select_moves(position, posibles)
   end
 end
@@ -141,12 +232,12 @@ def select_moves(position, posibles)
 end
 
 
-p "KING", King.new("\u2654").move([2,4])
-p "QUEEN", Queen.new("\u2655").move([2,4])
-p "BISHOP", Bishop.new("\u2656").move([2,4])
-p "KNIGHT", Knight.new("\u2657").move([2,4])
-p "ROOK", Rook.new("\u2658").move([2,4])
-p "PAWN1", Pawn.new("\u2659").move([2,4])
-p "PAWN2", Pawn.new("\u2659").move([4,4])
-p "PAWN1", Pawn.new("\u2659").move2([7,4])
-p "PAWN2", Pawn.new("\u2659").move2([6,4])
+#p "KING", King.new("\u2654").move([2,4])
+#p "QUEEN", Queen.new("\u2655").move([2,4])
+#p "BISHOP", Bishop.new("\u2656").move([2,4])
+#p "KNIGHT", Knight.new("\u2657").move([2,4])
+#p "ROOK", Rook.new("\u2658").move([2,4])
+#p "PAWN1", Pawn.new("\u2659").move([2,4])
+#p "PAWN2", Pawn.new("\u2659").move([4,4])
+#p "PAWN1", Pawn.new("\u2659").move2([7,4])
+#p "PAWN2", Pawn.new("\u2659").move2([6,4])

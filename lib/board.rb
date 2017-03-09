@@ -85,7 +85,8 @@ class Board
     @player2.pawn8.position = [2,8]
   end
   
-  def show(piece = nil, start_position = [0,0], finish_position = [0,0])
+  def show(piece = nil, start_position = [nil,nil], finish_position = [nil,nil])
+    piece.position = finish_position if !piece.nil?
     i = 0
     @positions.each do |position|
       i += 1
@@ -93,7 +94,7 @@ class Board
         @cells[i-1] = " "
       end
       if position == finish_position
-        @cells[i-1] = piece
+        @cells[i-1] = piece.piece
       end
     end
     puts "\n", " --+---+---+---+---+---+---+---+---+"

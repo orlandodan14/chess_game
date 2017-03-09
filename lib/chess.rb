@@ -33,6 +33,7 @@ class Game
     @board = Board.new(@player1, @player2)
     @board.show
     @curr_player = @player1
+    @other_player = @player2
     play
   end
   
@@ -58,7 +59,7 @@ class Game
     start = convert_position(start_position)
     finish_position = move[1]
     finish = convert_position(finish_position)
-    if start == @curr_player.king.position
+    if @curr_player.king.position == start
       piece = @curr_player.king
     elsif @curr_player.queen.position == start
       piece = @curr_player.queen
@@ -96,13 +97,12 @@ class Game
     piece == @player1.pawn4 || piece == @player1.pawn5 || 
     piece == @player1.pawn6 || piece == @player1.pawn7 || 
     piece == @player1.pawn8 )
-      posible_moves = piece.move2(start)
+      posible_moves = piece.move2(start, @curr_player, @other_player)
     else
-      posible_moves = piece.move(start)
+      posible_moves = piece.move(start, @curr_player, @other_player)
     end
     if posible_moves.include?(finish)
-      piece.position = finish
-      @board.show(piece.piece, start, finish)
+      @board.show(piece, start, finish)
       switch_players
       play
     else
@@ -115,7 +115,6 @@ class Game
     position = position.split("")
     if position.none? { |coord| coord.between?("1", "8") } || position.none? { |coord| coord.between?("a", "h") }
       puts "Wrong input. Try again."
-      
       play
     end
     axis_y = ["a", "b", "c", "d", "e", "f", "g", "h"]
@@ -135,8 +134,10 @@ class Game
   def switch_players
     if @curr_player == @player1
       @curr_player = @player2
+      @other_player = @player1
     else
       @curr_player = @player1
+      @other_player = @player2
     end
   end
 end
