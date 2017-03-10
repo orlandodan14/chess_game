@@ -137,12 +137,12 @@ class Pawn
     other = false
     curr = false
     other_player.pieces.each do |piece|
-      if piece.position == [position[0] + 2, position[1]]
+      if piece.position == [position[0] + 2, position[1]] || piece.position == [position[0] + 1, position[1]]
         other = true
       end
     end
     curr_player.pieces.each do |piece|
-      if piece.position == [position[0] + 2, position[1]]
+      if piece.position == [position[0] + 2, position[1]] || piece.position == [position[0] + 1, position[1]]
         curr = true
       end
     end
