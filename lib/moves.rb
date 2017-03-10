@@ -108,13 +108,42 @@ class Rook
     @piece = piece
   end
   
-  def move(position)
-    posibles = [
-      [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7],
-      [0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7],
-      [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
-      [-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0]
-    ]
+  def move(position, curr_player, other_player)
+    right = [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]]
+    left = [[0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7]]
+    upwards = [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]]
+    downwards = [[-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0]]
+    moves = [right, left, upwards, downwards]
+    posibles = []
+    
+    other = false
+    curr = false
+    
+    moves.each do |arr|
+      if !curr
+        arr.each do |move|
+          if !curr
+            if curr_player.pieces.any? { |piece| piece.position == [position[0] + move[0], position[1] + move[1]] }
+              break
+            else
+              posibles << move
+            end
+            
+            if other_player.pieces.any? { |piece| piece.position == [position[0] + move[0], position[1] + move[1]] }
+              posibles << move
+              break
+            else
+              posibles << move
+            end
+          else
+            break   
+          end
+        end
+      else
+        next
+      end
+    end
+    p posibles
     select_moves(position, posibles)
   end
   
@@ -200,12 +229,12 @@ class Pawn
     other = false
     curr = false
     other_player.pieces.each do |piece|
-      if piece.position == [position[0] - 2, position[1]]
+      if piece.position == [position[0] - 2, position[1]] || piece.position == [position[0] - 1, position[1]]
         other = true
       end
     end
     curr_player.pieces.each do |piece|
-      if piece.position == [position[0] - 2, position[1]]
+      if piece.position == [position[0] - 2, position[1]] || piece.position == [position[0] - 1, position[1]]
         curr = true
       end
     end

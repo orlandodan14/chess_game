@@ -77,12 +77,17 @@ class Game
       end
     end
     
-    if @curr_player == @player1 && ( @player1.pieces.include?(piece) )
+    if piece.nil?
+      puts "Wrong position for your piece, tray again"
+      play
+    end
+    
+    if @curr_player == @player1 && ( @player1.pawns.include?(piece) )
       posible_moves = piece.move2(start, @curr_player, @other_player)
     else
       posible_moves = piece.move(start, @curr_player, @other_player)
     end
-    
+    p posible_moves
     if posible_moves.include?(finish)
       if @curr_player.pawns.include?(piece)
         piece = pawn_crown(@curr_player, piece, finish)
@@ -154,4 +159,4 @@ class Game
   
 end
 
-Game.new
+game = Game.new
