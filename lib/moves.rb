@@ -1,7 +1,7 @@
 #class Player
 class Player
   attr_accessor :name, :king, :queen, :bishop1, :bishop2, :knight1, :knight2, :rook1, :rook2
-  attr_accessor :pawn1, :pawn2, :pawn3, :pawn4, :pawn5, :pawn6, :pawn7, :pawn8, :pieces
+  attr_accessor :pawn1, :pawn2, :pawn3, :pawn4, :pawn5, :pawn6, :pawn7, :pawn8, :pieces, :pawns
   
   def initialize(pieces)
     name = gets.chomp.upcase
@@ -22,16 +22,19 @@ class Player
     @pawn6 = Pawn.new(pieces[5])
     @pawn7 = Pawn.new(pieces[5])
     @pawn8 = Pawn.new(pieces[5])
+    @pawns = [@pawn1, @pawn2, @pawn3, @pawn4, @pawn5, @pawn6, @pawn7, @pawn8]
     @pieces = [@king, @queen, @bishop1, @bishop2, @knight1, @knight2, @rook1, @rook2, @pawn1, @pawn2, @pawn3, @pawn4, @pawn5, @pawn6, @pawn7, @pawn8]
   end  
 end
 
 class King
   attr_accessor :position, :piece 
+  
   def initialize(piece)
     @position = position
     @piece = piece
   end
+  
   def move(position)
     posibles = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]
     select_moves(position, posibles)   
@@ -39,32 +42,37 @@ class King
 end
 
 class Queen
-  attr_accessor :position, :piece 
+  attr_accessor :position, :piece
+  
   def initialize(piece)
     @position = position
     @piece = piece
   end
+  
   def move(position)
     posibles = [
-      [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7],
-      [0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7],
-      [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
-      [-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0],
-      [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],
-      [1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6], [7, -7],
-      [-1, 1], [-2, 2], [-3, 3], [-4, 4], [-5, 5], [-6, 6], [-7, 7],
-      [-1, -1], [-2, -2], [-3, -3], [-4, -4], [-5, -5], [-6, -6], [-7, -7]
+      [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], #to right
+      [0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7], #to left
+      [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], #upwards
+      [-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0], #downwards
+      [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], #upwards right
+      [1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6], [7, -7], #upwards left
+      [-1, 1], [-2, 2], [-3, 3], [-4, 4], [-5, 5], [-6, 6], [-7, 7], #downwards right
+      [-1, -1], [-2, -2], [-3, -3], [-4, -4], [-5, -5], [-6, -6], [-7, -7] #downwards left
     ]
     select_moves(position, posibles)
   end
+  
 end
 
 class Bishop
   attr_accessor :position, :piece 
+  
   def initialize(piece)
     @position = position
     @piece = piece
   end
+  
   def move(position)
     posibles = [
       [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],
@@ -74,26 +82,32 @@ class Bishop
     ]
     select_moves(position, posibles)
   end
+  
 end
  
 class Knight
-  attr_accessor :position, :piece 
+  attr_accessor :position, :piece
+  
   def initialize(piece)
     @position = position
     @piece = piece
   end
+  
   def move(position)
     posibles = [[-2,-1],[-2,1],[-1,-2],[-1,2],[2,-1],[2,1],[1,-2],[1,2]]
     select_moves(position, posibles)
   end
+  
 end
 
 class Rook
   attr_accessor :position, :piece 
+  
   def initialize(piece)
     @position = position
     @piece = piece
   end
+  
   def move(position)
     posibles = [
       [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7],
@@ -103,10 +117,12 @@ class Rook
     ]
     select_moves(position, posibles)
   end
+  
 end
  
 class Pawn
   attr_accessor :position, :piece, :path
+  
   def initialize(piece)
     @position = position
     @piece = piece
@@ -116,6 +132,8 @@ class Pawn
   #move method for player1
   def move(position, curr_player, other_player, path = 0)
     posibles = []
+    
+    #add [2,0]
     other = false
     curr = false
     other_player.pieces.each do |piece|
@@ -131,6 +149,8 @@ class Pawn
     if (!other && !curr) && @path == 0
       posibles << [2, 0]
     end
+    
+    #add [1,0]
     other = false
     curr = false
     other_player.pieces.each do |piece|
@@ -146,6 +166,8 @@ class Pawn
     if !other && !curr
       posibles << [1, 0]
     end
+    
+    #add [1, -1]
     other = false
     other_player.pieces.each do |piece|
       if piece.position == [position[0] + 1, position[1] - 1]
@@ -155,6 +177,8 @@ class Pawn
     if other
       posibles << [1, -1]
     end
+    
+    #add [1,1]
     other = false
     other_player.pieces.each do |piece|
       if piece.position == [position[0] + 1, position[1] + 1]
@@ -171,6 +195,8 @@ class Pawn
   #move method for player2
   def move2(position, curr_player, other_player, path = 0)
     posibles = []
+    
+    #add [-2,0]
     other = false
     curr = false
     other_player.pieces.each do |piece|
@@ -186,6 +212,8 @@ class Pawn
     if (!other && !curr) && @path == 0
       posibles << [-2, 0]
     end
+    
+    #add [-1,0]
     other = false
     curr = false
     other_player.pieces.each do |piece|
@@ -201,6 +229,8 @@ class Pawn
     if !other && !curr
       posibles << [-1, 0]
     end
+    
+    #add [-1,1]
     other = false
     other_player.pieces.each do |piece|
       if piece.position == [position[0] - 1, position[1] + 1]
@@ -210,6 +240,8 @@ class Pawn
     if other
       posibles << [-1, 1]
     end
+    
+    #add [-1, -1]
     other = false
     other_player.pieces.each do |piece|
       if piece.position == [position[0] - 1, position[1] - 1]
@@ -222,6 +254,7 @@ class Pawn
     @path += 1
     select_moves(position, posibles)
   end
+  
 end
 
 #Select the posible moves for the piece

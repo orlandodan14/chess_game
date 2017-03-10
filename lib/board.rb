@@ -1,11 +1,13 @@
 #class Board
 class Board
   attr_accessor :cells
+  
   def initialize(player1, player2)
     @player1 = player1
     @player2 = player2
     @cells = Array.new(64, " ")
     start_positions
+    
     @positions = [
       [1,1], [1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8],
       [2,1], [2,2], [2,3], [2,4], [2,5], [2,6], [2,7], [2,8],
@@ -97,6 +99,7 @@ class Board
         @cells[i-1] = piece.piece
       end
     end
+    
     puts "\n", " --+---+---+---+---+---+---+---+---+"
     puts " 8 | #{@cells[56]} | #{@cells[57]} | #{@cells[58]} | #{@cells[59]} | #{@cells[60]} | #{@cells[61]} | #{@cells[62]} | #{@cells[63]} | => #{@player1.name}"
     puts " --+---+---+---+---+---+---+---+---+"
@@ -116,4 +119,5 @@ class Board
     puts " --+---+---+---+---+---+---+---+---+"
     puts "   | a | b | c | d | e | f | g | h |", "\n"
   end
+  
 end

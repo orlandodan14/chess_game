@@ -14,6 +14,7 @@ class Game
         --N-- Start a new game.
         --L-- Load a saved game.
         --E-- Exit.}
+        
     choice = gets.chomp.downcase
     case choice
     when 'n' then new_game
@@ -23,6 +24,7 @@ class Game
       puts "I didn't understand, try again!"
       start_game
     end
+    
   end
   
   def new_game    
@@ -40,10 +42,11 @@ class Game
   def play
     puts %{#{@curr_player.name}, you can make a move, save your game or Exit the game!!
       c2-c4 : Moves the piece in: c2 To: c4.
-      2c-4c : Moves the piece in: c2 To: c4.
+      2c-4c : Moves the piece in: c2 To: c4, too.
         s   : Save the game.
         e   : Exit the game.}    
     print "Please type your selection: "
+    
     choise = gets.chomp.downcase
     case choise
     when 's' then save_game
@@ -51,57 +54,39 @@ class Game
     else
       make_move(choise)
     end
+    
   end
   
   def make_move(move)
-    move = move.split('-')
+    if move[2] == '-'
+      move = move.split('-')
+    else
+      puts "That isn't a movement, try again!"
+      play
+    end
+    
     start_position = move[0]
     start = convert_position(start_position)
     finish_position = move[1]
     finish = convert_position(finish_position)
-    if @curr_player.king.position == start
-      piece = @curr_player.king
-    elsif @curr_player.queen.position == start
-      piece = @curr_player.queen
-    elsif @curr_player.bishop1.position == start
-      piece = @curr_player.bishop1
-    elsif @curr_player.bishop2.position == start
-      piece = @curr_player.bishop2
-    elsif @curr_player.knight1.position == start
-      piece = @curr_player.knight1
-    elsif @curr_player.knight2.position == start
-      piece = @curr_player.knight2
-    elsif start == @curr_player.rook1.position
-      piece = @curr_player.rook1
-    elsif @curr_player.rook2.position == start
-      piece = @curr_player.rook2
-    elsif @curr_player.pawn1.position == start
-      piece = @curr_player.pawn1
-    elsif @curr_player.pawn2.position == start
-      piece = @curr_player.pawn2
-    elsif @curr_player.pawn3.position == start
-      piece = @curr_player.pawn3
-    elsif @curr_player.pawn4.position == start
-      piece = @curr_player.pawn4
-    elsif @curr_player.pawn5.position == start
-      piece = @curr_player.pawn5
-    elsif @curr_player.pawn6.position == start
-      piece = @curr_player.pawn6
-    elsif @curr_player.pawn7.position == start
-      piece = @curr_player.pawn7
-    elsif @curr_player.pawn8.position == start
-      piece = @curr_player.pawn8
+    
+    piece = nil
+    @curr_player.pieces.each do |p|
+      if p.position == start
+        piece = p
+      end
     end
-    if @curr_player == @player1 && ( piece == @player1.pawn1 || 
-    piece == @player1.pawn2 || piece == @player1.pawn3 || 
-    piece == @player1.pawn4 || piece == @player1.pawn5 || 
-    piece == @player1.pawn6 || piece == @player1.pawn7 || 
-    piece == @player1.pawn8 )
+    
+    if @curr_player == @player1 && ( @player1.pieces.include?(piece) )
       posible_moves = piece.move2(start, @curr_player, @other_player)
     else
       posible_moves = piece.move(start, @curr_player, @other_player)
     end
+    
     if posible_moves.include?(finish)
+      if @curr_player.pawns.include?(piece)
+        piece = pawn_crown(@curr_player, piece, finish)
+      end
       @board.show(piece, start, finish)
       switch_players
       play
@@ -140,6 +125,33 @@ class Game
       @other_player = @player2
     end
   end
+  
+  def pawn_crown(curr_player, piece, finish_position)
+    positions = [[1,1], [1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8],
+                 [8,1], [8,2], [8,3], [8,4], [8,5], [8,6], [8,7], [8,8]]
+    positions.each do |position|
+      if position == finish_position
+        puts %{#{curr_player.name}, you have crowned a pawn, please select your new piece!!        
+      1 => #{curr_player.pieces[0].piece}
+      2 => #{curr_player.pieces[1].piece}
+      3 => #{curr_player.pieces[2].piece}
+      4 => #{curr_player.pieces[3].piece}
+      5 => #{curr_player.pieces[4].piece}}      
+        print "Please type your selection: "
+        
+        choise = gets.chomp
+        case choise
+        when "1" then piece = curr_player.pieces[0]
+        when "2" then piece = curr_player.pieces[1]
+        when "3" then piece = curr_player.pieces[2]
+        when "4" then piece = curr_player.pieces[4]
+        when "5" then piece = curr_player.pieces[6]
+        end
+      end
+    end
+    piece
+  end
+  
 end
 
 Game.new
