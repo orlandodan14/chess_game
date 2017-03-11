@@ -114,39 +114,47 @@ class Rook
     upwards = [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]]
     downwards = [[-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0]]
     moves = [right, left, upwards, downwards]
-    posibles = []
     
-    other = false
-    curr = false
-    
-    moves.each do |arr|
-      if !curr
-        arr.each do |move|
-          if !curr
-            if curr_player.pieces.any? { |piece| piece.position == [position[0] + move[0], position[1] + move[1]] }
-              break
-            else
-              posibles << move
-            end
-            
-            if other_player.pieces.any? { |piece| piece.position == [position[0] + move[0], position[1] + move[1]] }
-              posibles << move
-              break
-            else
-              posibles << move
-            end
-          else
-            break   
-          end
-        end
-      else
-        next
-      end
-    end
-    p posibles
+    posibles = filter_move(moves, position, curr_player, other_player)
     select_moves(position, posibles)
   end
   
+end
+
+def filter_move(moves, position, curr_player, other_player)
+  pos = []    
+  other = false
+  curr = false
+    
+  moves.each do |arr|
+    if !other || !curr
+      arr.each do |move|
+        if !other || !curr
+          if curr_player.pieces.any? { |piece| piece.position == [position[0] + move[0], position[1] + move[1]] }
+            curr = true
+            break
+          else
+            pos << move
+          end
+          
+          if other_player.pieces.any? { |piece| piece.position == [position[0] + move[0], position[1] + move[1]] }
+            other = true
+            pos << move
+            break
+          else
+            pos << move
+          end
+        else
+          break
+        end                     
+      end
+    else
+      other = false
+      curr = false
+      next  
+    end        
+  end
+  pos
 end
  
 class Pawn
