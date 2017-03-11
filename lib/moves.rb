@@ -225,7 +225,6 @@ class Pawn
     if other
       posibles << [1, 1]
     end
-    @path += 1
     select_moves(position, posibles)
   end
   
@@ -288,7 +287,6 @@ class Pawn
     if other
       posibles << [-1, -1]
     end
-    @path += 1
     select_moves(position, posibles)
   end
   

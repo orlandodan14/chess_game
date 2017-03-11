@@ -90,6 +90,7 @@ class Game
     p posible_moves
     if posible_moves.include?(finish)
       if @curr_player.pawns.include?(piece)
+        piece.path += 1
         piece = pawn_crown(@curr_player, piece, finish)
       end
       @board.show(piece, start, finish)
