@@ -35,8 +35,18 @@ class King
     @piece = piece
   end
   
-  def move(position)
-    posibles = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]
+  def move(position, curr_player, other_player)
+    right = [[0, 1]]
+    left = [[0, -1]]
+    upwards = [[1, 0]]
+    downwards = [[-1, 0]]
+    upright = [[1, 1]]
+    upleft = [[1, -1]]
+    downright = [[-1, 1]]
+    downleft = [[-1, -1]]
+    moves = [right, left, upwards, downwards, upright, upleft, downright, downleft]
+    
+    posibles = filter_move(moves, position, curr_player, other_player)
     select_moves(position, posibles)   
   end  
 end
@@ -49,17 +59,18 @@ class Queen
     @piece = piece
   end
   
-  def move(position)
-    posibles = [
-      [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], #to right
-      [0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7], #to left
-      [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], #upwards
-      [-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0], #downwards
-      [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], #upwards right
-      [1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6], [7, -7], #upwards left
-      [-1, 1], [-2, 2], [-3, 3], [-4, 4], [-5, 5], [-6, 6], [-7, 7], #downwards right
-      [-1, -1], [-2, -2], [-3, -3], [-4, -4], [-5, -5], [-6, -6], [-7, -7] #downwards left
-    ]
+  def move(position, curr_player, other_player)
+    right = [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]]
+    left = [[0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7]]
+    upwards = [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]]
+    downwards = [[-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0]]
+    upright = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7]]
+    upleft = [[1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6], [7, -7]]
+    downright = [[-1, 1], [-2, 2], [-3, 3], [-4, 4], [-5, 5], [-6, 6], [-7, 7]]
+    downleft = [[-1, -1], [-2, -2], [-3, -3], [-4, -4], [-5, -5], [-6, -6], [-7, -7]]
+    moves = [right, left, upwards, downwards, upright, upleft, downright, downleft]
+    
+    posibles = filter_move(moves, position, curr_player, other_player)
     select_moves(position, posibles)
   end
   
@@ -73,13 +84,14 @@ class Bishop
     @piece = piece
   end
   
-  def move(position)
-    posibles = [
-      [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],
-      [1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6], [7, -7],
-      [-1, 1], [-2, 2], [-3, 3], [-4, 4], [-5, 5], [-6, 6], [-7, 7],
-      [-1, -1], [-2, -2], [-3, -3], [-4, -4], [-5, -5], [-6, -6], [-7, -7]
-    ]
+  def move(position, curr_player, other_player)
+    upright = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7]]
+    upleft = [[1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6], [7, -7]]
+    downright = [[-1, 1], [-2, 2], [-3, 3], [-4, 4], [-5, 5], [-6, 6], [-7, 7]]
+    downleft = [[-1, -1], [-2, -2], [-3, -3], [-4, -4], [-5, -5], [-6, -6], [-7, -7]]
+    moves = [upright, upleft, downright, downleft]
+    
+    posibles = filter_move(moves, position, curr_player, other_player)
     select_moves(position, posibles)
   end
   
@@ -93,8 +105,18 @@ class Knight
     @piece = piece
   end
   
-  def move(position)
-    posibles = [[-2,-1],[-2,1],[-1,-2],[-1,2],[2,-1],[2,1],[1,-2],[1,2]]
+  def move(position, curr_player, other_player)
+    upright = [[2, 1]]
+    upleft = [[2, -1]]
+    rightup = [[1, 2]]
+    leftup = [[1, -2]]
+    downright = [[-2, 1]]
+    downleft = [[-2, -1]]
+    rightdown = [[-1, 2]]
+    leftdown = [[-1, -2]]
+    moves = [upright, upleft, rightup, leftup, downright, downleft, rightdown, leftdown]
+    
+    posibles = filter_move(moves, position, curr_player, other_player)
     select_moves(position, posibles)
   end
   
@@ -122,39 +144,41 @@ class Rook
 end
 
 def filter_move(moves, position, curr_player, other_player)
-  pos = []    
+  posibles = []    
   other = false
   curr = false
     
   moves.each do |arr|
-    if !other || !curr
+    if !other && !curr
       arr.each do |move|
-        if !other || !curr
+        if !other && !curr
           if curr_player.pieces.any? { |piece| piece.position == [position[0] + move[0], position[1] + move[1]] }
             curr = true
             break
           else
-            pos << move
+            posibles << move unless posibles.include?(move)
           end
-          
-          if other_player.pieces.any? { |piece| piece.position == [position[0] + move[0], position[1] + move[1]] }
+                                
+          if !curr && other_player.pieces.any? { |piece| piece.position == [position[0] + move[0], position[1] + move[1]] }
             other = true
-            pos << move
+            posibles << move unless posibles.include?(move)
+            break
+          elsif curr
             break
           else
-            pos << move
+            posibles << move unless posibles.include?(move)
           end
         else
           break
-        end                     
-      end
+        end                                 
+      end      
     else
       other = false
       curr = false
-      next  
+      redo
     end        
   end
-  pos
+  posibles
 end
  
 class Pawn
