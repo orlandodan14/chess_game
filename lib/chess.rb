@@ -1,3 +1,4 @@
+require "yaml"
 load 'board.rb'
 load 'moves.rb'
 
@@ -40,6 +41,7 @@ class Game
   end
   
   def play
+    @board.show(piece = nil, start = nil, finish = nil)
     puts %{#{@curr_player.name}, you can make a move, save your game or Exit the game!!
       c2-c4 : Moves the piece in: c2 To: c4.
       2c-4c : Moves the piece in: c2 To: c4, too.
@@ -87,14 +89,19 @@ class Game
     else
       posible_moves = piece.move(start, @curr_player, @other_player)
     end
-    p posible_moves
+
     if posible_moves.include?(finish)
       if @curr_player.pawns.include?(piece)
         piece.path += 1
         piece = pawn_crown(@curr_player, piece, finish)
       end
-      @board.show(piece, start, finish)
-      switch_players
+      piece.position = finish
+      @other_player.pieces.each do |other_piece|
+        if other_piece.position == finish
+          @other_player.pieces.delete(other_piece)
+        end
+      end
+      checkmate(piece, start, finish, @curr_player, @other_player)
       play
     else
       puts "Wrong input, try again."
@@ -156,6 +163,90 @@ class Game
       end
     end
     piece
+  end
+  
+  def checkmate(piece, start, finish, curr_player, other_player)
+    curr_king_moves = []
+    other_king_moves = []
+    curr_pieces_moves = []
+    other_pieces_moves = []
+    
+    curr_player.pieces.each do |piece|
+      if curr_player == @player1 && ( @player1.pawns.include?(piece) )
+        moves = piece.move2(piece.position, curr_player, other_player)
+        curr_pieces_moves += moves
+      elsif piece == curr_player.king
+        moves = piece.move(piece.position, curr_player, other_player)
+        curr_pieces_moves += moves
+        curr_king_moves = moves
+      else
+        moves = piece.move(piece.position, curr_player, other_player)
+        curr_pieces_moves += moves
+      end
+    end
+    
+    other_player.pieces.each do |piece|
+      if other_player == @player1 && ( @player1.pawns.include?(piece) )
+        moves = piece.move2(piece.position, other_player, curr_player)
+        other_pieces_moves += moves
+      elsif piece == other_player.king
+        moves = piece.move(piece.position, other_player, curr_player)
+        other_pieces_moves += moves
+        other_king_moves = moves
+      else
+        moves = piece.move(piece.position, other_player, curr_player)
+        other_pieces_moves += moves
+      end
+    end
+        
+    if other_pieces_moves.include?(curr_player.king.position)
+      piece.position = start
+      puts "#{curr_player.name}, you are in CHECK!!!!!!!!!!!! Tray again."
+    elsif other_king_moves.all? { |move_king| curr_pieces_moves.include?(move_king) } &&
+      curr_pieces_moves.include?(other_player.king.position)
+      @board.show(piece, start, finish)
+      puts "#{curr_player.name}, WON!!!!!!!!!!! CONGRATULATION!!!!!!!!!!!!!"
+      exit
+     elsif curr_pieces_moves.include?(other_player.king.position)
+      puts "#{other_player.name}, you are in CHECK!!!!!!!!!!!!"
+      switch_players
+    else
+      @board.show(piece, start, finish)
+      switch_players
+    end
+        
+  end
+  
+  #Save the game: 
+  #Serializes the game object to a file with the chosen name.
+  def save_game
+    puts "Enter a name for your saved game:"
+    name = gets.chomp
+    if Dir.exists?("saves")
+       File.open("saves/#{name}.sv", 'w') {|file| file.write(YAML::dump(self))}
+      puts "Game saved!"
+    else
+      Dir.mkdir("saves")
+       File.open("saves/#{name}.sv", 'w') {|file| file.write(YAML::dump(self))}
+      puts "Game saved!"
+    end
+    
+  end
+  
+  #Takes a name of a saved game object as an argument and loads the object.
+  def load_game
+    puts 'Please type the name of your game:'
+    name = gets.chomp
+    if File.exists?("saves/#{name}.sv")
+      YAML::load(File.open("saves/#{name}.sv")).play
+    elsif Dir.glob('saves/*').empty?
+      puts 'No saved games found!'
+      start_game
+    else
+      puts 'Found the following saves:'
+      puts Dir.glob('saves/*').join("\n")
+      start_game
+    end
   end
   
 end
